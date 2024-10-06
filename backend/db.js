@@ -1,0 +1,38 @@
+const mongoose = require('mongoose');
+const { Schema } = mongoose;
+
+mongoose.connect('mongodb+srv://m0hit04:Kx2so0MONGODB@cluster0.s1f7njv.mongodb.net/paytm');
+
+const userSchema = new Schema({
+    username: {
+        type: String,
+        unique: true,
+        required: true,
+        minLength: 6,
+        maxLength: 30,
+        trim: true,
+        lowercase: true
+    },
+    password: {
+        type: String,
+        minLength: 6,
+        maxLength: 30,
+        required: true
+    },
+    firstName: {
+        type: String,
+        required: true,
+        trim: true,
+        maxLength: 50
+    },
+    lastName: {
+        type: String,
+        required: true,
+        trim: true,
+        maxLength: 50
+    }
+})
+
+const User = mongoose.model('User', userSchema);
+
+module.exports = { User };
