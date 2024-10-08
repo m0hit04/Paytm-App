@@ -1,7 +1,7 @@
 const express = require('express');
 const zod = require("zod");
 const router = express.Router();
-const { User } = require('../db')
+const { User, Account } = require('../db')
 const jwt = require("jsonwebtoken");
 const { JWT_SECRET } = require('../config');
 const { authMiddleware } = require('../middleware')
@@ -35,6 +35,13 @@ router.post("/signUp", async (req, res) => {
         lastName: req.body.lastName
     });
     const userId = newUser._id;
+
+
+    await Account.create({
+        userId: userId,
+        balance: ( Math.random() * 10000 ) + 1
+    })
+
     const token = jwt.sign({userId}, JWT_SECRET);
     res.status(200).send({
         "message": "User created successfully",
@@ -84,7 +91,11 @@ router.put("/", authMiddleware, async (req, res) => {
             "msg" : "Error while updating information"
         })
     }
-
+    if (req.body.username) {
+        return res.status(411).send({
+            "msg" : "Can't update username"
+        })
+    }
     const result = await User.updateOne({ _id : req.userId }, req.body);
     res.send({
         "msg" : "Updated successfully"
@@ -92,24 +103,24 @@ router.put("/", authMiddleware, async (req, res) => {
 })
 
 router.get("/bulk", async (req, res) => {
-    const filter = req.query.filter || "";
-    console.log(filter);
-    
+    const filter = req.query.filter || "";  
 
     const users = await User.find({
         $or: [{
             firstName: {
-                "$regex": filter
+                "$regex": filter,
+                "$options" : "i"
             }
         }, {
             lastName: {
-                "$regex": filter
+                "$regex": filter,
+                "$options" : "i"
             }
         }]
     })
 
     res.json({
-        user: users.map(user => ({
+        users: users.map(user => ({
             username: user.username,
             firstName: user.firstName,
             lastName: user.lastName,
@@ -118,10 +129,10 @@ router.get("/bulk", async (req, res) => {
     })
 })
 
-router.post("/test", authMiddleware, (req, res) => {
-    res.send({
-        "msg" : "Successful"
-    })
-})
+// router.post("/test", authMiddleware, (req, res) => {
+//     res.send({
+//         "msg" : "Successful"
+//     })
+// })
 
 module.exports = router;
