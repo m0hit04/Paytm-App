@@ -5,40 +5,29 @@ import { Balance } from "../components/Balance"
 import { Users } from "../components/Users"
 import { useNavigate } from "react-router-dom"
 import useValidRequest from "../hooks/useValidRequest"
+import useFetchBalance from "../hooks/useFetchBalance"
 
 // can apply lazy loading concept here
 export const Dashboard = () => {
-  const [balance, setBalance] = useState("")
   const navigate = useNavigate();
   const isValidRequest = useValidRequest();
+  const fetchBalance = useFetchBalance();
 
   useEffect(() => {
     if (!isValidRequest) {
       navigate("/");
       return false;
     }
-
-    const fetchBalance = async () => {
-      try {
-        const token = localStorage.getItem("token");
-        const response = await axios.get("http://localhost:3000/api/v1/account/balance", {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        });
-        setBalance(response.data.balance);
-      } catch (err) {
-        console.log(err);
-        navigate("/");
-      }
-    };
-    fetchBalance();
-  }, [navigate, isValidRequest])
+    if (!fetchBalance.success) {
+      navigate("/");
+      return false;
+    }
+  }, [navigate, isValidRequest, fetchBalance])
 
   return <div>
     <Appbar />
-    <div className="m-8">
-      <Balance value={balance} />
+    <div className="mx-8">
+      <Balance value={fetchBalance.balance} />
       <Users />
     </div>
   </div>

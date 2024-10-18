@@ -13,8 +13,6 @@ export const Users = () => {
         const handler = setTimeout(() => {
             setDebouncedFilter(filter);
         }, 500);
-
-        // Clean up the timeout if the user types again before the delay is over
         return () => {
             clearTimeout(handler);
         };

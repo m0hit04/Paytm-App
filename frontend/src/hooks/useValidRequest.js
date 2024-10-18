@@ -1,11 +1,12 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 
 const useValidRequest = () => {
+  const [userData, setUserData] = useState({});
   useEffect(() => {
     const token = localStorage.getItem("token");    
     if (!token) {
-      return false;
+      return {success: false, userData};
     }
 
     axios.get("http://localhost:3000/api/v1/me/", {
@@ -14,14 +15,16 @@ const useValidRequest = () => {
       }
     }).then((res) => {
       if (!res.data) {
-        return false;
+        return {success: false, userData};
+      } else {
+        setUserData(res.data)
       }
     }).catch((err) => {
       console.log(err);
-      return false;
+      return {success: false, userData};
     });
   }, []);
-  return true;
+  return {success: true, userData};
 };
 
 export default useValidRequest;
