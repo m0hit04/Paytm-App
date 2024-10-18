@@ -1,10 +1,19 @@
-import {useState} from "react"
-import { useSearchParams } from "react-router-dom";
+import { useState, useEffect } from "react"
+import { useNavigate, useSearchParams } from "react-router-dom";
 import axios from "axios"
+import useValidRequest from "../hooks/useValidRequest";
 
 export const SendMoney = () => {
   const [searchParams] = useSearchParams();
   const [amount, setAmount] = useState("");
+  const isValidRequest = useValidRequest();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!isValidRequest) {
+      navigate("/")
+    }
+  }, [isValidRequest, navigate]);
 
   return <div className="flex justify-center h-screen bg-gray-100">
       <div className="h-full flex flex-col justify-center">
