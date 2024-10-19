@@ -23,7 +23,7 @@ const useValidRequest = () => {
       console.log(err);
       return {success: false, userData};
     });
-  }, []);
+  }, [userData]);
   return {success: true, userData};
 };
 

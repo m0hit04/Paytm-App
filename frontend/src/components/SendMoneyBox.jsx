@@ -40,6 +40,7 @@ export default function SendMoneyBox() {
                                     />
                                 </div>
                                 <button onClick={() => {
+                                    // console.log("Hi there")
                                     axios.post("http://localhost:3000/api/v1/account/transfer", {
                                         amount,
                                         to: searchParams.get("id")
