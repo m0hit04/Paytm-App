@@ -1,5 +1,4 @@
-import { useEffect, useState } from "react"
-import axios from "axios"
+import { useEffect } from "react"
 import { Appbar } from "../components/Appbar"
 import { Balance } from "../components/Balance"
 import { Users } from "../components/Users"
