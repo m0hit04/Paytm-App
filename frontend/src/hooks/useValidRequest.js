@@ -3,28 +3,40 @@ import axios from "axios";
 
 const useValidRequest = () => {
   const [userData, setUserData] = useState({});
+  const [success, setSuccess] = useState(false);
+
   useEffect(() => {
     const token = localStorage.getItem("token");    
     if (!token) {
-      return {success: false, userData};
+      console.log("Token not present");
+      setSuccess(false);
+      return;
+    } else {
+      axios.get("http://localhost:3000/api/v1/me/", {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      })
+      .then((res) => {
+        if (res.data) {
+          setUserData(res.data);
+          setSuccess(true);
+          console.log("True");
+        } else {
+          console.log("User data empty");
+          setSuccess(false);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+        setSuccess(false);
+      });
     }
+  }, []);
 
-    axios.get("http://localhost:3000/api/v1/me/", {
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    }).then((res) => {
-      if (!res.data) {
-        return {success: false, userData};
-      } else {
-        setUserData(res.data)
-      }
-    }).catch((err) => {
-      console.log(err);
-      return {success: false, userData};
-    });
-  }, [userData]);
-  return {success: true, userData};
+  // console.log({success, userData});
+  
+  return { success, userData };
 };
 
 export default useValidRequest;
