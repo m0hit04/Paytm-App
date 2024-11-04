@@ -5,6 +5,12 @@ const { User, Account } = require('../db')
 const jwt = require("jsonwebtoken");
 const { authMiddleware } = require('../middleware')
 
+router.get("/userDetails", authMiddleware, async (req, res) => {
+    const user = await User.findOne({_id : req.userId}, ['username', 'firstName', 'lastName']);
+    res.json(user);
+})
+
+
 const signUpBody = zod.object({
     username: zod.string().email().min(6).max(30),
     password: zod.string().min(6).max(30),
