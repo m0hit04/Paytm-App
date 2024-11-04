@@ -1,33 +1,56 @@
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import { Appbar } from "../components/Appbar"
 import { Balance } from "../components/Balance"
 import { Users } from "../components/Users"
 import { useNavigate } from "react-router-dom"
-import useValidRequest from "../hooks/useValidRequest"
-import useFetchBalance from "../hooks/useFetchBalance"
+import axios from "axios"
 
-// can apply lazy loading concept here
 export const Dashboard = () => {
   const navigate = useNavigate();
-  const isValidRequest = useValidRequest();
-  const fetchBalance = useFetchBalance();
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [balance, setBalance] = useState(0);
 
   useEffect(() => {
-    if (!isValidRequest) {
-      navigate("/");
-      return false;
-    }
-    if (!fetchBalance.success) {
-      navigate("/");
-      return false;
-    }
-  }, [navigate, isValidRequest, fetchBalance])
+    axios.get("http://localhost:3000/api/v1/me", {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`
+      }
+    })
+      .then((res) => {
+        console.log(res);
+        setIsAuthenticated(true);
+      })
+      .catch((err) => {
+        console.log(`User is not validated : ${err}`);
+        setIsAuthenticated(false)
+        navigate("/");
+      })
 
-  return <div>
-    <Appbar />
-    <div className="mx-8">
-      <Balance value={fetchBalance.balance} />
-      <Users />
-    </div>
-  </div>
+    axios.get("http://localhost:3000/api/v1/account/balance", {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`
+      }
+    })
+      .then((res) => {
+        console.log(res);
+        setBalance(res.data.balance)
+      })
+      .catch(() => {
+        console.log(`Can not fetch balance`);
+      })
+  }, [navigate])
+
+  return  (
+    (isAuthenticated ? (    
+      <div>
+        <Appbar />
+        <div className="mx-8">
+          <Balance value={balance} />
+          <Users />
+        </div>
+      </div>
+    ) : <p>Loading...</p> 
+  )
+)
+  
 }
