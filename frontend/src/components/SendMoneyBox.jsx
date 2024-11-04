@@ -2,9 +2,10 @@ import axios from "axios"
 import { useState } from "react";
 import { useSearchParams } from "react-router-dom";
 
-export default function SendMoneyBox() {
+export default function SendMoneyBox({fetchBalance}) {
     const [searchParams] = useSearchParams();
     const [amount, setAmount] = useState("");
+    const [successMessage, setSuccessMessage] = useState("");
 
     return (
         <>
@@ -36,6 +37,7 @@ export default function SendMoneyBox() {
                                         type="number"
                                         className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
                                         id="amount"
+                                        value={amount}
                                         placeholder="Enter amount"
                                     />
                                 </div>
@@ -50,10 +52,20 @@ export default function SendMoneyBox() {
                                         }
                                     }).then((res) => {
                                         console.log(res);
+                                        fetchBalance();
+                                        setAmount("");
+                                        setSuccessMessage("Transfer Successfull!");
+                                        setTimeout(() => setSuccessMessage(""), 3000);
+                                    }).catch(() => {
+                                        setSuccessMessage("Transfer Failed. Please try again.");
+                                        setTimeout(() => setSuccessMessage(""), 3000);
                                     })
                                 }} className="justify-center rounded-md text-sm font-medium ring-offset-background transition-colors h-10 px-4 py-2 w-full bg-green-500 text-white">
                                     Initiate Transfer
                                 </button>
+                                {successMessage && (
+                                    <p className="text-center text-green-600 mt-4">{successMessage}</p>
+                                )}
                             </div>
                         </div>
                     </div>

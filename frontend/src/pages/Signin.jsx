@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import axios from "axios"
 import { useNavigate } from "react-router-dom";
 import { BottomWarning } from "../components/BottomWarning"
@@ -8,9 +8,27 @@ import { InputBox } from "../components/InputBox"
 import { SubHeading } from "../components/SubHeading"
 
 export const Signin = () => {
+  const [isAuthenticated, setIsAuthenticated] = useState("");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
+
+  useEffect(() => {
+    axios.get("http://localhost:3000/api/v1/me", {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`
+      }
+    })
+      .then((res) => {
+        console.log(res.data.msg);
+        setIsAuthenticated(true);
+        navigate("/dashboard");
+      })
+      .catch((err) => {
+        console.log(`User is not validated : ${err}`);
+        setIsAuthenticated(false)
+      })
+  }, [navigate])
 
   return <div className="bg-slate-300 h-screen flex justify-center">
     <div className="flex flex-col justify-center">
